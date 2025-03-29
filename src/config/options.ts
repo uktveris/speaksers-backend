@@ -6,9 +6,15 @@ const corsOptions = {
   credentials: true,
 };
 
+const corsSocketOptions = {
+  origin: "http://localhost:8081",
+  methods: ["GET", "POST"],
+  credentials: true,
+};
+
 const cookieOptions: CookieOptions = {
   httpOnly: true,
   sameSite: "lax",
 };
 
-export { corsOptions, cookieOptions };
+export { corsOptions, cookieOptions, corsSocketOptions };
