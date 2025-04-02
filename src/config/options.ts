@@ -7,9 +7,9 @@ const corsOptions = {
 };
 
 const corsSocketOptions = {
-  origin: "http://localhost:8081",
+  origin: ["http://localhost:8081"],
   methods: ["GET", "POST"],
-  credentials: true,
+  // credentials: true,
 };
 
 const cookieOptions: CookieOptions = {
