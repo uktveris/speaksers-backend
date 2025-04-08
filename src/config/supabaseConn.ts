@@ -1,6 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 const url = process.env.SUPABASE_AUTH_URL!;

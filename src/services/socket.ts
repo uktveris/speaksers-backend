@@ -55,6 +55,14 @@ function initSocket(server: any) {
         .emit("ice-candidate", { candidate: data.candidate, from: socket.id });
     });
 
+    socket.on("end-call", (data) => {
+      console.log(
+        "user: " + socket.id + "is ending call with user " + data.recipient,
+      );
+      waitingUser = null;
+      socket.to(data.recipient).emit("end-call");
+    });
+
     socket.on("disconnect", () => {
       if (waitingUser === socket) {
         waitingUser = null;
