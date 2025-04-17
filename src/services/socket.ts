@@ -1,8 +1,24 @@
 import { Server } from "socket.io";
 import { corsSocketOptions } from "../config/options";
 import { Socket } from "socket.io";
+import { timeLog } from "console";
 
 let waitingUser: Socket | null = null;
+
+const timeLogger = () => {
+  const d = new Date();
+  return (
+    "[" +
+    d.getHours() +
+    ":" +
+    d.getMinutes() +
+    ":" +
+    d.getSeconds() +
+    ":" +
+    d.getMilliseconds() +
+    "]:"
+  );
+};
 
 function initSocket(server: any) {
   const io = new Server(server, {
@@ -10,10 +26,10 @@ function initSocket(server: any) {
   });
 
   io.on("connection", (socket) => {
-    console.log("user connected: " + socket.id);
+    console.log(timeLogger() + "user connected: " + socket.id);
 
     socket.on("join_call", (message) => {
-      console.log("user " + socket.id + " is looking for call");
+      console.log(timeLogger() + "user " + socket.id + " is looking for call");
       if (waitingUser && waitingUser != socket) {
         socket.emit("match_found", waitingUser.id);
         // waitingUser.emit("match_found", socket.id);
@@ -25,7 +41,7 @@ function initSocket(server: any) {
     });
 
     socket.on("cancel_call", () => {
-      console.log("user " + socket.id + " is cancelling call");
+      console.log(timeLogger() + "user " + socket.id + " is cancelling call");
       if (waitingUser && waitingUser.id === socket.id) {
         waitingUser = null;
         socket.emit("call_cancelled");
@@ -34,7 +50,11 @@ function initSocket(server: any) {
 
     socket.on("offer", (data) => {
       console.log(
-        "user: " + socket.id + " is sending offer to: " + data.recipient,
+        timeLogger() +
+          "user: " +
+          socket.id +
+          " is sending offer to: " +
+          data.recipient,
       );
       socket
         .to(data.recipient)
@@ -42,14 +62,22 @@ function initSocket(server: any) {
     });
 
     socket.on("answer", (data) => {
-      console.log("user: " + socket.id + " is answering to: " + data.recipient);
+      console.log(
+        timeLogger() +
+          "user: " +
+          socket.id +
+          " is answering to: " +
+          data.recipient,
+      );
       socket
         .to(data.recipient)
         .emit("answer", { answer: data.answer, from: socket.id });
     });
 
     socket.on("ice-candidate", (data) => {
-      console.log("user: " + socket.id + " is sending ICE candiate");
+      console.log(
+        timeLogger() + "user: " + socket.id + " is sending ICE candiate",
+      );
       socket
         .to(data.recipient)
         .emit("ice-candidate", { candidate: data.candidate, from: socket.id });
@@ -57,9 +85,13 @@ function initSocket(server: any) {
 
     socket.on("end-call", (data) => {
       console.log(
-        "user: " + socket.id + "is ending call with user " + data.recipient,
+        timeLogger() +
+          "user: " +
+          socket.id +
+          "is ending call with user " +
+          data.recipient,
       );
-      waitingUser = null;
+      // waitingUser = null;
       socket.to(data.recipient).emit("end-call");
     });
 
@@ -67,7 +99,7 @@ function initSocket(server: any) {
       if (waitingUser === socket) {
         waitingUser = null;
       }
-      console.log("user disconnected");
+      console.log(timeLogger() + "user disconnected: " + socket.id);
     });
   });
 }
