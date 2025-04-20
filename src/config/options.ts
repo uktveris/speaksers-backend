@@ -2,6 +2,7 @@ import { CookieOptions } from "express";
 
 const corsOptions = {
   origin: ["http://localhost:8081"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 200,
   credentials: true,
 };
