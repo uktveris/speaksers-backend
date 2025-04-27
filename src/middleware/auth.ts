@@ -7,18 +7,26 @@ interface ExtendedRequest extends Request {
 
 const jwtSecret = process.env.SUPABASE_JWT_SECRET as string;
 
-function authMiddleware(req: Request, res: Response, next: NextFunction) {
+function authMiddleware(req: any, res: Response, next: NextFunction) {
+  console.log("using auth..");
   const auth = req.headers.authorization;
   if (!auth?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing authorization header" });
+    console.log("no bearer found..");
+    res.status(401).json({ error: "Missing authorization header" });
+    return;
   }
 
   const token = auth.split(" ")[1];
   try {
     const payload = jwt.verify(token, jwtSecret);
-    req.user = payload.sub;
+    console.log("payload: " + payload);
+    req.user = payload.sub as string;
+    console.log("set user");
     next();
   } catch (err) {
-    return res.status(401).json({ error: "Error: " + (err as Error).message });
+    res.status(401).json({ error: "Error: " + (err as Error).message });
+    return;
   }
 }
+
+export { authMiddleware };

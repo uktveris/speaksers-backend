@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import supabase from "../config/supabaseConn";
+import supabase from "../../config/supabaseConn";
 
 const deleteUser = async (req: Request, res: Response) => {
   console.log("accessing delete user endpoint");
