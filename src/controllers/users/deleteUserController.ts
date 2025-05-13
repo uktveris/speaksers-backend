@@ -8,6 +8,7 @@ const deleteUser = async (req: Request, res: Response) => {
     const { data, error } = await supabase.auth.admin.deleteUser(userId);
     if (error) {
       res.status(400).json({ msg: error.message });
+      console.log("error details: ", error);
       return;
     }
 

@@ -97,6 +97,9 @@ function initSocket(server: any) {
 
     socket.on("disconnect", () => {
       if (waitingUser === socket) {
+        console.log(
+          timeLogger() + "user removed from call queue: " + socket.id,
+        );
         waitingUser = null;
       }
       console.log(timeLogger() + "user disconnected: " + socket.id);
