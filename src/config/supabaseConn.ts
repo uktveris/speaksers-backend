@@ -1,9 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
-dotenv.config();
 
-const url = process.env.SUPABASE_AUTH_URL!;
-const key = process.env.SUPABASE_AUTH_KEY!;
+const url = process.env.SUPABASE_AUTH_URL;
+const key = process.env.SUPABASE_AUTH_KEY;
+
+if (!url || !key) {
+  const msg = `cannot create supabase client: url is: ${url} and key is: ${key}`;
+  throw new Error(msg);
+}
 
 const supabase = createClient(url, key);
 
