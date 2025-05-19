@@ -6,8 +6,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 import router from "./routes";
 import initSocket from "./services/socket";
+import path from "path";
 
-dotenv.config();
+// dotenv.config();
+const envFile = `.env.${process.env.NODE_ENV || "development"}`;
+dotenv.config({ path: path.resolve(__dirname, envFile) });
 
 const port = process.env.PORT;
 
