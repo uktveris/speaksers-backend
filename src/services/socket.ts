@@ -1,27 +1,11 @@
 import { Server } from "socket.io";
 import { corsSocketOptions } from "../config/options";
 import { Socket } from "socket.io";
-import { timeLog } from "console";
 import { logger } from "../config/logging";
 
 const context = "SOCKET";
 
 let waitingUser: Socket | null = null;
-
-const timeLogger = () => {
-  const d = new Date();
-  return (
-    "[" +
-    d.getHours() +
-    ":" +
-    d.getMinutes() +
-    ":" +
-    d.getSeconds() +
-    ":" +
-    d.getMilliseconds() +
-    "]:"
-  );
-};
 
 function initSocket(server: any) {
   const io = new Server(server, {
