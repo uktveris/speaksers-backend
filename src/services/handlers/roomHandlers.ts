@@ -1,7 +1,6 @@
 import { DefaultEventsMap, Server, Socket } from "socket.io";
 import { logger } from "../../config/logging";
-import { createRoom, endRoom, getCallRooms } from "../roomManager";
-import { CallRoom } from "../roomManager";
+import { createRoom, endRoom, initiateTopicSetup } from "../roomManager";
 
 const context = "ROOM_HANDLERS";
 
@@ -11,7 +10,7 @@ export function roomHandlers(
   io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
 ) {
-  socket.on("join_call", (message) => {
+  socket.on("join_call", () => {
     logger.info({
       message: "initiated call search",
       context: context,
@@ -22,6 +21,8 @@ export function roomHandlers(
     if (waitingUser && waitingUser != socket) {
       socket.emit("match_found", waitingUser.id);
       waitingUser.emit("init_call", socket.id);
+      const callId = createRoom(io, socket, waitingUser);
+      initiateTopicSetup(io, callId, socket, waitingUser);
       waitingUser = null;
     } else {
       waitingUser = socket;

@@ -11,19 +11,6 @@ export interface CallRoom {
 
 const callRooms = new Map<string, CallRoom>();
 
-export function getCallRooms() {
-  return callRooms;
-}
-
-export function getUserRoom(socketId: string): string | null {
-  for (const [roomId, roomInfo] of callRooms.entries()) {
-    if (roomInfo.participants.includes(socketId)) {
-      return roomId;
-    }
-  }
-  return null;
-}
-
 export function getRoom(callId: string): CallRoom | null {
   if (!callRooms.get(callId)) {
     console.log("no room with id: ", callId);
@@ -47,18 +34,29 @@ export function createRoom(
     createdAt: Date.now(),
   });
 
-  socket1.emit("match_found", { callId: callId, role: role1 });
-  socket2.emit("init_call", { callId: callId, role: role2 });
-
   socket1.join(callId);
   console.log("user: " + socket1.id + " -> " + callId);
   socket2.join(callId);
   console.log("user: " + socket2.id + " -> " + callId);
+  return callId;
+}
 
+export function initiateTopicSetup(
+  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  callId: string,
+  socket1: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  socket2: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+) {
+  const roles = getRoles();
   const topic = getRandomTopic();
-  io.to(callId).emit("call_started", {
-    callId,
-    roles: [role1, role2],
+  io.to(socket1.id).emit("topic_sent", {
+    callId: callId,
+    role: roles[0],
+    topic: topic,
+  });
+  io.to(socket2.id).emit("topic_sent", {
+    callId: callId,
+    role: roles[1],
     topic: topic,
   });
 }
