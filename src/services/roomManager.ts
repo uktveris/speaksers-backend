@@ -1,6 +1,9 @@
 import { DefaultEventsMap, Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { getRandomTopic, getRoles } from "./callMechanics";
+import { logger } from "../config/logging";
+
+const context = "ROOM_MANAGER";
 
 export interface CallRoom {
   id: string;
@@ -38,6 +41,15 @@ export function createRoom(
   console.log("user: " + socket1.id + " -> " + callId);
   socket2.join(callId);
   console.log("user: " + socket2.id + " -> " + callId);
+
+  logger.info({
+    message: "room created",
+    context: context,
+    meta: {
+      additionalInfo: { roomId: callId },
+    },
+  });
+
   return callId;
 }
 
@@ -61,10 +73,28 @@ export function initiateTopicSetup(
   });
 }
 
+export async function removeRoomMembers(
+  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  callId: string,
+) {
+  const roomSockets = await io.in(callId).fetchSockets();
+  roomSockets.forEach((socket) => {
+    socket.leave(callId);
+  });
+}
+
 export function endRoom(callId: string) {
   if (!callRooms.get(callId)) {
     console.log("trying to delete unexisting room: ", { callId });
     return;
   }
+  console.log("room deleted: ", { callId });
   callRooms.delete(callId);
+  logger.info({
+    message: "room deleted",
+    context: context,
+    meta: {
+      additionalInfo: { roomId: callId },
+    },
+  });
 }

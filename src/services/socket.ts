@@ -7,8 +7,6 @@ import { roomHandlers } from "./handlers/roomHandlers";
 
 const context = "SOCKET";
 
-let waitingUser: Socket | null = null;
-
 function initSocket(server: any) {
   const io = new Server(server, {
     cors: corsSocketOptions,

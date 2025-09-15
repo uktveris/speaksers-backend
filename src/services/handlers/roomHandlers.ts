@@ -1,6 +1,11 @@
 import { DefaultEventsMap, Server, Socket } from "socket.io";
 import { logger } from "../../config/logging";
-import { createRoom, endRoom, initiateTopicSetup } from "../roomManager";
+import {
+  createRoom,
+  endRoom,
+  initiateTopicSetup,
+  removeRoomMembers,
+} from "../roomManager";
 
 const context = "ROOM_HANDLERS";
 
@@ -43,7 +48,7 @@ export function roomHandlers(
     }
   });
 
-  socket.on("end-call", (data) => {
+  socket.on("end-call", async (data) => {
     logger.info({
       message: "call ended",
       context: context,
@@ -55,6 +60,8 @@ export function roomHandlers(
       },
     });
     socket.to(data.recipient).emit("end-call");
+    await removeRoomMembers(io, data.callId);
+    endRoom(data.callId);
   });
 
   socket.on("disconnect", () => {
