@@ -2,15 +2,9 @@ import { DefaultEventsMap, Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { getRandomTopic, getRoles } from "./callMechanics";
 import { logger } from "../config/logging";
+import { CallRoom } from "../models/rooms";
 
 const context = "ROOM_MANAGER";
-
-export interface CallRoom {
-  id: string;
-  participants: string[];
-  roles: string[];
-  createdAt: number;
-}
 
 const callRooms = new Map<string, CallRoom>();
 
@@ -20,6 +14,17 @@ export function getRoom(callId: string): CallRoom | null {
     return null;
   }
   return callRooms.get(callId)!;
+}
+
+export async function getRoomSize(
+  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  callId: string,
+): Promise<number | null> {
+  if (!callRooms.get(callId)) {
+    console.log("no room with id: ", callId);
+    return null;
+  }
+  return (await io.in(callId).fetchSockets()).length;
 }
 
 export function createRoom(
@@ -35,6 +40,7 @@ export function createRoom(
     participants: [socket1.id, socket2.id],
     roles: [role1, role2],
     createdAt: Date.now(),
+    timerStopVotes: new Set(),
   });
 
   socket1.join(callId);

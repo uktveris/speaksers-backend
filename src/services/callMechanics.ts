@@ -1,3 +1,5 @@
+import { TopicTask } from "../models/rooms";
+
 export function getRoles(): string[] {
   const roles = ["A", "B"];
   return Math.random() > 0.5 ? roles : roles.reverse();
@@ -6,13 +8,6 @@ export function getRoles(): string[] {
 export function getRandomTopic(): TopicTask {
   const index = Math.floor(Math.random() * dummyTopicTasks.length);
   return dummyTopicTasks[index];
-}
-
-export interface TopicTask {
-  id: number;
-  topic: string;
-  type: string;
-  question: string;
 }
 
 export const dummyTopicTasks: TopicTask[] = [
