@@ -12,6 +12,7 @@ function initSocket(server: any) {
     cors: corsSocketOptions,
   });
 
+  // TODO: add auth protection to socket on connection handler
   io.on("connection", (socket) => {
     logger.info({
       message: "user connected",
@@ -20,9 +21,19 @@ function initSocket(server: any) {
         additionalInfo: { socketId: socket.id },
       },
     });
+  });
 
-    signalingHandlers(io, socket);
-    roomHandlers(io, socket);
+  const callsNsp = io.of("/calls");
+  callsNsp.on("connection", (socket) => {
+    console.log("new user connected to calls nsp: ", socket.id);
+
+    signalingHandlers(callsNsp, socket);
+    roomHandlers(callsNsp, socket);
+  });
+
+  const chatNsp = io.of("/chats");
+  chatNsp.on("connection", (socket) => {
+    console.log("new user connected to chat nsp: ", socket.id);
   });
 }
 

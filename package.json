@@ -34,7 +34,9 @@
     "express": "^4.21.2",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
+    "mediasoup": "^3.19.2",
     "socket.io": "^4.8.1",
+    "uuid": "^13.0.0",
     "winston": "^3.17.0",
     "winston-transport": "^4.9.0"
   }

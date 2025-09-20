@@ -1,10 +1,10 @@
-import { DefaultEventsMap, Server, Socket } from "socket.io";
+import { DefaultEventsMap, Server, Socket, Namespace } from "socket.io";
 import { logger } from "../../config/logging";
 
 const context = "SIGNALING";
 
 export function signalingHandlers(
-  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
 ) {
   socket.on("offer", (data) => {

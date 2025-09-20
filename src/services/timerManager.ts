@@ -1,9 +1,9 @@
-import { DefaultEventsMap, Server, Socket } from "socket.io";
+import { DefaultEventsMap, Namespace, Socket } from "socket.io";
 
 const timers = new Map<string, number>();
 
 export function createTimer(
-  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket1: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket2: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   callId: string,

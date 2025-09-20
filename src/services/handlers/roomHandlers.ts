@@ -1,8 +1,9 @@
-import { DefaultEventsMap, Server, Socket } from "socket.io";
+import { DefaultEventsMap, Namespace, Socket } from "socket.io";
 import { logger } from "../../config/logging";
 import {
   createRoom,
   endRoom,
+  findSocketRoom,
   getRoom,
   getRoomSize,
   initiateTopicSetup,
@@ -15,7 +16,7 @@ const context = "ROOM_HANDLERS";
 let waitingUser: Socket | null = null;
 
 export function roomHandlers(
-  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
 ) {
   socket.on("join_call", () => {
@@ -72,7 +73,7 @@ export function roomHandlers(
     }
   });
 
-  socket.on("end-call", async (data) => {
+  socket.on("end_call", async (data) => {
     logger.info({
       message: "call ended",
       context: context,
@@ -83,7 +84,7 @@ export function roomHandlers(
         },
       },
     });
-    socket.to(data.recipient).emit("end-call");
+    socket.to(data.recipient).emit("end_call");
     await removeRoomMembers(io, data.callId);
     deleteTimer(data.callId);
     endRoom(data.callId);
@@ -99,6 +100,10 @@ export function roomHandlers(
         },
       });
       waitingUser = null;
+    }
+    const room = findSocketRoom(socket.id);
+    if (room) {
+      io.to(room.id).emit("end_call");
     }
     logger.info({
       message: "user disconnected",

@@ -1,4 +1,4 @@
-import { DefaultEventsMap, Server, Socket } from "socket.io";
+import { DefaultEventsMap, Namespace, Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { getRandomTopic, getRoles } from "./callMechanics";
 import { logger } from "../config/logging";
@@ -7,6 +7,15 @@ import { CallRoom } from "../models/rooms";
 const context = "ROOM_MANAGER";
 
 const callRooms = new Map<string, CallRoom>();
+
+export function findSocketRoom(id: string): CallRoom | null {
+  for (let room of callRooms.values()) {
+    if (room.participants.find((p) => p === id)) {
+      return room;
+    }
+  }
+  return null;
+}
 
 export function getRoom(callId: string): CallRoom | null {
   if (!callRooms.get(callId)) {
@@ -17,7 +26,7 @@ export function getRoom(callId: string): CallRoom | null {
 }
 
 export async function getRoomSize(
-  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   callId: string,
 ): Promise<number | null> {
   if (!callRooms.get(callId)) {
@@ -28,7 +37,7 @@ export async function getRoomSize(
 }
 
 export function createRoom(
-  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket1: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket2: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
 ) {
@@ -60,7 +69,7 @@ export function createRoom(
 }
 
 export function initiateTopicSetup(
-  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   callId: string,
   socket1: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket2: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
@@ -80,7 +89,7 @@ export function initiateTopicSetup(
 }
 
 export async function removeRoomMembers(
-  io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   callId: string,
 ) {
   const roomSockets = await io.in(callId).fetchSockets();
