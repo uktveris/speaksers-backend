@@ -1,9 +1,20 @@
 import { DefaultEventsMap, Server, Socket, Namespace } from "socket.io";
 import { logger } from "../../config/logging";
+import { Router } from "mediasoup/node/lib/RouterTypes";
+import { AppData } from "mediasoup/node/lib/types";
+import { Consumer, Producer } from "mediasoup/node/lib/types";
+import { WebRtcTransport } from "mediasoup/node/lib/WebRtcTransportTypes";
+import { v4 as uuidv4 } from "uuid";
+import {
+  createMediasoupWorker,
+  mediacodecs,
+  transportOptions,
+} from "../../sfu/utils";
+import { getOrCreateTransportRoom } from "../../sfu/transportManager";
 
 const context = "SIGNALING";
 
-export function signalingHandlers(
+export async function signalingHandlers(
   io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
 ) {

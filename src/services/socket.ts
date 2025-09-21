@@ -24,10 +24,10 @@ function initSocket(server: any) {
   });
 
   const callsNsp = io.of("/calls");
-  callsNsp.on("connection", (socket) => {
+  callsNsp.on("connection", async (socket) => {
     console.log("new user connected to calls nsp: ", socket.id);
 
-    signalingHandlers(callsNsp, socket);
+    await signalingHandlers(callsNsp, socket);
     roomHandlers(callsNsp, socket);
   });
 
