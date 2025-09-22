@@ -14,7 +14,7 @@ console.log("running default avatar seed script...");
 
 const supabase = createClient(
   process.env.SUPABASE_AUTH_URL!,
-  process.env.SUPABASE_AUTH_KEY!,
+  process.env.SUPABASE_SECRET_KEY!,
 );
 
 async function seedAvatars() {

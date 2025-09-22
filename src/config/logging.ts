@@ -1,7 +1,6 @@
 import Transport from "winston-transport";
 import supabase from "./supabaseConn";
 import winston from "winston";
-import { Request } from "express";
 
 class SupabaseTransport extends Transport {
   async log(
