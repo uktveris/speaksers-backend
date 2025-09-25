@@ -1,13 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import { jwtVerify, createRemoteJWKSet } from "jose";
+import { jwtVerify, createRemoteJWKSet, JWTPayload } from "jose";
+import supabase from "../config/supabaseConn";
 
 const url = process.env.SUPABASE_AUTH_URL!;
 const jwks = createRemoteJWKSet(
   new URL(`${url}/auth/v1/.well-known/jwks.json`),
 );
 
+interface AuthRequest extends Request {
+  userId?: string;
+}
+
 export async function authMiddleware(
-  req: any,
+  req: AuthRequest,
   res: Response,
   next: NextFunction,
 ) {
@@ -20,12 +25,20 @@ export async function authMiddleware(
 
   const token = auth.split(" ")[1];
   try {
-    const { payload } = await jwtVerify(token, jwks, {
-      issuer: `${url}/auth/v1`,
-      audience: "authenticated",
-    });
-    req.user = payload.sub;
-    console.log("set user");
+    // const { payload, protectedHeader } = await jwtVerify(token, jwks);
+    // console.log("received payload: ", { payload });
+    // console.log("received protectedHeader: ", { protectedHeader });
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token);
+    if (error || !user) {
+      console.log("error: ", { error });
+      return;
+    }
+    // req.userId = payload.sub;
+    // req.claims = payload;
+    req.userId = user.id;
     return next();
   } catch (err) {
     console.log("jwt verification failed: ", { err });

@@ -21,11 +21,27 @@ function initSocket(server: any) {
         additionalInfo: { socketId: socket.id },
       },
     });
+
+    socket.on("disconnect", () => {
+      logger.info({
+        message: "user disconnected",
+        context: context,
+        meta: {
+          additionalInfo: { socketId: socket.id },
+        },
+      });
+    });
   });
 
   const callsNsp = io.of("/calls");
   callsNsp.on("connection", async (socket) => {
-    console.log("new user connected to calls nsp: ", socket.id);
+    logger.info({
+      message: "user connected",
+      context: context,
+      meta: {
+        additionalInfo: { socketId: socket.id },
+      },
+    });
 
     await signalingHandlers(callsNsp, socket);
     roomHandlers(callsNsp, socket);
@@ -33,7 +49,13 @@ function initSocket(server: any) {
 
   const chatNsp = io.of("/chats");
   chatNsp.on("connection", (socket) => {
-    console.log("new user connected to chat nsp: ", socket.id);
+    logger.info({
+      message: "user connected",
+      context: context,
+      meta: {
+        additionalInfo: { socketId: socket.id },
+      },
+    });
   });
 }
 
