@@ -4,8 +4,11 @@ import { Socket } from "socket.io";
 import { logger } from "../config/logging";
 import { signalingHandlers } from "./handlers/signalingHandlers";
 import { roomHandlers } from "./handlers/roomHandlers";
+import { createMediasoupWorker } from "../sfu/utils";
 
 const context = "SOCKET";
+
+const worker = createMediasoupWorker();
 
 function initSocket(server: any) {
   const io = new Server(server, {
@@ -13,7 +16,7 @@ function initSocket(server: any) {
   });
 
   // TODO: add auth protection to socket on connection handler
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     logger.info({
       message: "user connected",
       context: context,
@@ -43,7 +46,7 @@ function initSocket(server: any) {
       },
     });
 
-    await signalingHandlers(callsNsp, socket);
+    await signalingHandlers(callsNsp, socket, await worker);
     roomHandlers(callsNsp, socket);
   });
 
