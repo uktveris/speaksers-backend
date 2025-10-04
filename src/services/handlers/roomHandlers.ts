@@ -10,15 +10,14 @@ import {
   removeRoomMembers,
 } from "../roomManager";
 import { createTimer, deleteTimer } from "../timerManager";
+import { cleanTransportRoom, joinTransportRoom } from "../../sfu/transportManager";
+import { Worker, AppData } from "mediasoup/node/lib/types";
 
 const context = "ROOM_HANDLERS";
 
 let waitingUser: Socket | null = null;
 
-export function roomHandlers(
-  io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
-  socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
-) {
+export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppData>) {
   socket.on("join_call", () => {
     logger.info({
       message: "initiated call search",
@@ -35,6 +34,8 @@ export function roomHandlers(
       initiateTopicSetup(io, callId, socket, waitingUser);
       const duration = 1000 * 60;
       createTimer(io, socket, waitingUser, callId, duration);
+
+      joinTransportRoom(io, socket, waitingUser, worker, callId);
       waitingUser = null;
     } else {
       waitingUser = socket;
@@ -46,10 +47,7 @@ export function roomHandlers(
     if (!room) return;
     room.timerStopVotes.add(socket.id);
     const size = await getRoomSize(io, data.callId);
-    console.log(
-      "socket " + socket.id + " is voting to stop timer, timerStopvotes: ",
-      room.timerStopVotes.size,
-    );
+    console.log("socket " + socket.id + " is voting to stop timer, timerStopvotes: ", room.timerStopVotes.size);
     if (!size) return;
     const peer = room.participants.find((p) => p !== socket.id)!;
     io.to(peer).emit("peer_ready");
@@ -74,6 +72,7 @@ export function roomHandlers(
   });
 
   socket.on("end_call", async (data) => {
+    console.log("transport rooms state on end_call:");
     logger.info({
       message: "call ended",
       context: context,
@@ -88,6 +87,7 @@ export function roomHandlers(
     await removeRoomMembers(io, data.callId);
     deleteTimer(data.callId);
     endRoom(data.callId);
+    cleanTransportRoom(data.callId);
   });
 
   socket.on("disconnect", () => {
@@ -106,7 +106,7 @@ export function roomHandlers(
       io.to(room.id).emit("end_call");
     }
     logger.info({
-      message: "user disconnected",
+      message: "user disconnected /calls nsp",
       context: context,
       meta: {
         additionalInfo: { socketId: socket.id },

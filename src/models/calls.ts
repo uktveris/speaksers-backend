@@ -19,6 +19,5 @@ export interface Peer {
 export interface TransportRoom {
   id: string;
   peers: Map<string, Peer>;
-  router?: Router<AppData>;
-  rtpCapabilities?: RtpCapabilities;
+  router: Router<AppData>;
 }

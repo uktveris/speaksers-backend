@@ -1,10 +1,10 @@
 import { createWorker } from "mediasoup";
-import { Router } from "mediasoup/node/lib/RouterTypes";
+import { PipeToRouterOptions, Router } from "mediasoup/node/lib/RouterTypes";
 import { RouterRtpCodecCapability } from "mediasoup/node/lib/rtpParametersTypes";
-import { AppData, WebRtcTransportOptions } from "mediasoup/node/lib/types";
+import { AppData, TransportListenInfo, WebRtcTransportOptions } from "mediasoup/node/lib/types";
 import { Worker } from "mediasoup/node/lib/types";
 
-export const mediacodecs: RouterRtpCodecCapability[] = [
+const mediacodecs: RouterRtpCodecCapability[] = [
   {
     kind: "audio",
     mimeType: "audio/opus",
@@ -13,14 +13,20 @@ export const mediacodecs: RouterRtpCodecCapability[] = [
   },
 ];
 
-// const testIp = "127.0.0.1";
-const testIp = "192.168.0.106";
+// TODO: change to dynamic
+const announcedIp = "192.168.0.106";
 
-export const transportOptions: WebRtcTransportOptions = {
-  listenIps: [{ ip: "0.0.0.0", announcedIp: testIp }],
+const transportOptions: WebRtcTransportOptions = {
+  listenIps: [{ ip: "0.0.0.0", announcedIp: announcedIp }],
   enableTcp: true,
   enableUdp: true,
   preferUdp: true,
+};
+
+const listenInfo: TransportListenInfo = {
+  protocol: "udp",
+  ip: announcedIp,
+  portRange: { min: 2000, max: 2020 },
 };
 
 export async function createMediasoupWorker() {
@@ -36,39 +42,31 @@ export async function createMediasoupWorker() {
 }
 
 export async function createMediasoupRouter(worker: Worker<AppData>) {
-  return await worker.createRouter({ mediaCodecs: mediacodecs });
+  const router = await worker.createRouter({ mediaCodecs: mediacodecs });
+  const pipeToRouterOptions: PipeToRouterOptions = {
+    router: router,
+    listenInfo: listenInfo,
+  };
+  return router;
 }
 
-export async function createMediasoupTransport(
-  router: Router<AppData>,
-  // callback: (params: any) => void,
-  callback: any,
-) {
-  try {
-    const transport = await router.createWebRtcTransport(transportOptions);
-    console.log("creating transport: ", transport.id);
-    transport.on("dtlsstatechange", (state) => {
-      if (state === "closed") {
-        transport.close();
-      }
-    });
+export async function createMediasoupTransport(router: Router<AppData>) {
+  const transport = await router.createWebRtcTransport(transportOptions);
+  transport.on("dtlsstatechange", (state) => {
+    if (state === "closed") {
+      transport.close();
+    }
+  });
 
-    transport.on("@close", () => {
-      console.log("transport closed");
-    });
+  transport.on("@close", () => {
+    console.log("transport closed");
+  });
+  const params = {
+    id: transport.id,
+    iceParameters: transport.iceParameters,
+    iceCandidates: transport.iceCandidates,
+    dtlsParameters: transport.dtlsParameters,
+  };
 
-    callback({
-      params: {
-        id: transport.id,
-        iceParameters: transport.iceParameters,
-        iceCandidates: transport.iceCandidates,
-        dtlsParameters: transport.dtlsParameters,
-      },
-    });
-
-    return transport;
-  } catch (error) {
-    console.log(error);
-    callback({ params: { error: error } });
-  }
+  return { transport, params };
 }
