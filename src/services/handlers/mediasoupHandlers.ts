@@ -81,7 +81,7 @@ export async function attachMediasoupHandlers(io: Namespace, socket: Socket, roo
     });
     for (let [otherId, otherPeer] of room.peers.entries()) {
       if (otherId === socket.id) continue;
-      console.log("emitting new producer to peer:", otherId);
+      console.log("emitting new producer to peer:", otherId, "producerId:", producer.id);
       // io.
       socket.to(otherId).emit("new_producer", {
         producerId: producer.id,
@@ -110,8 +110,8 @@ export async function attachMediasoupHandlers(io: Namespace, socket: Socket, roo
     for (let [otherId, otherPeer] of room.peers.entries()) {
       console.log("otherpeer (", otherPeer.id, ") producers:", otherPeer.producers);
       if (otherId === socket.id) continue;
-      // const pr = otherPeer.producers.get(producerId);
-      const pr = otherPeer.producers.values().next().value;
+      const pr = otherPeer.producers.get(producerId);
+      // const pr = otherPeer.producers.values().next().value;
       if (pr) {
         producerToConsume = pr;
         break;
@@ -168,17 +168,6 @@ export async function attachMediasoupHandlers(io: Namespace, socket: Socket, roo
         },
       });
     }
-  });
-
-  socket.on("get_producers", (callback) => {
-    const producers: { producerId: string; producerPeerId: string; kind: string }[] = [];
-    for (let [otherId, otherPeer] of room.peers.entries()) {
-      if (otherId === socket.id) continue;
-      for (let producer of otherPeer.producers.values()) {
-        producers.push({ producerId: producer.id, producerPeerId: otherId, kind: producer.kind });
-      }
-    }
-    callback(producers);
   });
 
   socket.on("consume_resume", async ({ consumerId }) => {
