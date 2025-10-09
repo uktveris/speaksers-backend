@@ -203,7 +203,7 @@ export async function attachMediasoupHandlers(io: Namespace, socket: Socket, roo
     deleteTransportRoom(room.id);
 
     logger.info({
-      message: "user disconnected",
+      message: "user disconnected /calls nsp",
       context: context,
       meta: {
         additionalInfo: { senderSocketId: socket.id },
