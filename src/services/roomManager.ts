@@ -2,7 +2,7 @@ import { DefaultEventsMap, Namespace, Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import { getRandomTopic, getRoles } from "./callMechanics";
 import { logger } from "../config/logging";
-import { CallRoom } from "../models/rooms";
+import { CallRoom, StudentTopic } from "../models/rooms";
 
 const context = "ROOM_MANAGER";
 
@@ -76,15 +76,32 @@ export function initiateTopicSetup(
 ) {
   const roles = getRoles();
   const topic = getRandomTopic();
+
+  const topic1: StudentTopic = {
+    id: topic.id,
+    title: topic.title,
+    role: topic.role1,
+    arg: topic.arg1,
+    tip: topic.tip1,
+  };
+
+  const topic2: StudentTopic = {
+    id: topic.id,
+    title: topic.title,
+    role: topic.role2,
+    arg: topic.arg2,
+    tip: topic.tip2,
+  };
+
   io.to(socket1.id).emit("topic_sent", {
     callId: callId,
     role: roles[0],
-    topic: topic,
+    topic: topic1,
   });
   io.to(socket2.id).emit("topic_sent", {
     callId: callId,
     role: roles[1],
-    topic: topic,
+    topic: topic2,
   });
 }
 

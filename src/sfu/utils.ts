@@ -14,10 +14,13 @@ const mediacodecs: RouterRtpCodecCapability[] = [
 ];
 
 // TODO: change to dynamic
-const announcedIp = "192.168.0.106";
+// const announcedIp = "192.168.0.106";
+// const announcedIp = "172.20.10.4";
+const announcedIp = "192.168.8.114";
 
 const transportOptions: WebRtcTransportOptions = {
   listenIps: [{ ip: "0.0.0.0", announcedIp: announcedIp }],
+  // listenIps: [{ip: "0.0.0.0"}],
   enableTcp: true,
   enableUdp: true,
   preferUdp: true,

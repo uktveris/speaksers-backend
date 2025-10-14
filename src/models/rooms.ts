@@ -7,8 +7,20 @@ export interface CallRoom {
 }
 
 export interface TopicTask {
-  id: number;
-  topic: string;
-  type: string;
-  question: string;
+  id: string;
+  title: string;
+  role1: string;
+  role2: string;
+  arg1: string;
+  arg2: string;
+  tip1: string;
+  tip2: string;
+}
+
+export interface StudentTopic {
+  id: string;
+  title: string;
+  role: string;
+  arg: string;
+  tip: string;
 }

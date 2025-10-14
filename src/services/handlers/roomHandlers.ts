@@ -18,6 +18,7 @@ const context = "ROOM_HANDLERS";
 let waitingUser: Socket | null = null;
 
 export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppData>) {
+  let callStarted = false;
   socket.on("join_call", () => {
     logger.info({
       message: "initiated call search",
@@ -53,8 +54,19 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
     io.to(peer).emit("peer_ready");
     if (size <= room.timerStopVotes.size) {
       console.log("votes treshold reached, stopping timer..");
-      io.to(data.callId).emit("timer_stopped");
+      // io.to(data.callId).emit("timer_stopped");
+      io.to(room.id).emit("timer_stopped");
+      io.to(room.id).emit("start_call");
     }
+  });
+
+  socket.on("timer_ended", ({ callId }) => {
+    if (callStarted) return;
+    callStarted = true;
+    console.log("timer_ended received, emmiting start_call");
+    const room = getRoom(callId);
+    if (!room) return;
+    io.to(room.id).emit("start_call");
   });
 
   socket.on("cancel_call", () => {
