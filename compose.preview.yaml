@@ -1,0 +1,8 @@
+services:
+  backend:
+    image: speaksers-backend:latest
+    command: npm run preview
+    ports:
+      - "8080:8080"
+    env_file: ".env.preview"
+    restart: unless-stopped

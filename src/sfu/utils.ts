@@ -13,14 +13,20 @@ const mediacodecs: RouterRtpCodecCapability[] = [
   },
 ];
 
-// TODO: change to dynamic
-// const announcedIp = "192.168.0.106";
-// const announcedIp = "172.20.10.4";
-const announcedIp = "192.168.8.114";
+const announcedIp = process.env.MEDIASOUP_ANNOUNCED_IP;
+const listenIp = process.env.MEDIASOUP_LISTEN_IP;
+if (!announcedIp || !listenIp) {
+  console.log("mediasoup utils: fatal: no announcedIp or listenIp found in env vars");
+}
+
+const minPort = Number(process.env.MEDIASOUP_MIN_PORT);
+const maxPort = Number(process.env.MEDIASOUP_MAX_PORT);
+if (!minPort || !maxPort) {
+  console.log("mediasoup utils: fatal: no min or max port found in env vars");
+}
 
 const transportOptions: WebRtcTransportOptions = {
-  listenIps: [{ ip: "0.0.0.0", announcedIp: announcedIp }],
-  // listenIps: [{ip: "0.0.0.0"}],
+  listenIps: [{ ip: listenIp!, announcedIp: announcedIp }],
   enableTcp: true,
   enableUdp: true,
   preferUdp: true,
@@ -28,12 +34,15 @@ const transportOptions: WebRtcTransportOptions = {
 
 const listenInfo: TransportListenInfo = {
   protocol: "udp",
-  ip: announcedIp,
-  portRange: { min: 2000, max: 2020 },
+  ip: announcedIp!,
+  portRange: { min: minPort, max: maxPort },
 };
 
 export async function createMediasoupWorker() {
-  const worker = await createWorker();
+  const worker = await createWorker({
+    rtcMinPort: minPort,
+    rtcMaxPort: maxPort,
+  });
 
   console.log("mediasoup worker created: ", worker.pid);
 
