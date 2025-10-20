@@ -68,14 +68,19 @@ export function createRoom(
   return callId;
 }
 
-export function initiateTopicSetup(
+export async function initiateTopicSetup(
   io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   callId: string,
   socket1: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   socket2: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
 ) {
   const roles = getRoles();
-  const topic = getRandomTopic();
+  const topic = await getRandomTopic();
+
+  if (!topic) {
+    console.log("error occurred, topic is undefined");
+    return;
+  }
 
   const topic1: StudentTopic = {
     id: topic.id,

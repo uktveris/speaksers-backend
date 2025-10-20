@@ -1,0 +1,92 @@
+[
+  {
+    "title": "Voting Age",
+    "role1": "Lower to 16",
+    "arg1": "Show how 16-year-olds already have responsibilities (work, pay taxes, drive in some countries).",
+    "tip1": "Argue they deserve representation too; use examples from countries where voting starts at 16.",
+    "role2": "Keep at 18",
+    "arg2": "Argue maturity and knowledge reasons why 18 is a better age.",
+    "tip2": "Say teens are too influenced by peers/parents and lack life experience."
+  },
+  {
+    "title": "Extreme Sports",
+    "role1": "Restrict them",
+    "arg1": "Use safety statistics or injury examples.",
+    "tip1": "Stress government responsibility to protect citizens.",
+    "role2": "Allow them",
+    "arg2": "Emphasize freedom of choice and personal growth.",
+    "tip2": "Compare extreme sports risks to everyday ones like driving."
+  },
+  {
+    "title": "AI in Education",
+    "role1": "Allow AI",
+    "arg1": "Give 2 positive uses of AI (personalized learning, fast information).",
+    "tip1": "Compare AI to calculators in math—once controversial, now normal.",
+    "role2": "Ban AI",
+    "arg2": "Show 2 dangers (cheating, dependency).",
+    "tip2": "Argue that real learning means thinking independently."
+  },
+  {
+    "title": "Social Media Age Limit",
+    "role1": "Ban under 16",
+    "arg1": "Give 2 dangers (mental health, cyberbullying, privacy).",
+    "tip1": "Use emotional examples like stress or online harassment.",
+    "role2": "Allow with supervision",
+    "arg2": "Show 2 benefits (connection, digital skills, access to communities).",
+    "tip2": "Suggest parental controls or rules instead of bans."
+  },
+  {
+    "title": "Homework",
+    "role1": "Pro-homework",
+    "arg1": "Give 2 reasons why practice at home improves performance.",
+    "tip1": "Use analogy: training in sports improves skills just like homework does.",
+    "role2": "Anti-homework",
+    "arg2": "Argue from stress and well-being; mention family or hobby time.",
+    "tip2": "Suggest alternatives like project-based learning."
+  },
+  {
+    "title": "Smartphones in Class",
+    "role1": "Ban phones",
+    "arg1": "Present 2 strong cases where phones distract or harm focus.",
+    "tip1": "Use examples of addiction or misuse in class.",
+    "role2": "Allow phones",
+    "arg2": "Show how phones can be learning tools (apps, dictionaries, emergencies).",
+    "tip2": "Suggest clear rules for responsible use."
+  },
+  {
+    "title": "AI & Jobs (Trending)",
+    "role1": "Govt should retrain workers",
+    "arg1": "Give 2 sectors where AI disrupts jobs (transport, customer service).",
+    "tip1": "Argue retraining prevents unemployment crises.",
+    "role2": "Private sector should adapt",
+    "arg2": "Argue markets and companies innovate faster than governments.",
+    "tip2": "Warn about over-regulation killing progress."
+  },
+  {
+    "title": "Digital Privacy & Surveillance (Trending)",
+    "role1": "Limit data collection",
+    "arg1": "Give 2 risks (privacy breaches, discrimination).",
+    "tip1": "Use examples of data leaks or scandals.",
+    "role2": "Support surveillance",
+    "arg2": "Argue benefits (crime prevention, personalized services).",
+    "tip2": "Appeal to safety and public good."
+  },
+  {
+    "title": "Climate Policy — Urgency vs Growth (Trending)",
+    "role1": "Aggressive climate action now",
+    "arg1": "Show evidence of climate risks and future costs of inaction.",
+    "tip1": "Argue for protecting future generations.",
+    "role2": "Prioritize growth",
+    "arg2": "Show how harsh policies can hurt jobs and stability.",
+    "tip2": "Suggest gradual, balanced approaches."
+  },
+  {
+    "title": "Universal Basic Income — UBI (Trending)",
+    "role1": "Pro-UBI",
+    "arg1": "Use examples or pilot projects; argue for poverty reduction and stability.",
+    "tip1": "Show how it prepares for automation and inequality.",
+    "role2": "Anti-UBI",
+    "arg2": "Argue it’s too expensive and discourages work.",
+    "tip2": "Suggest other solutions like job programs or targeted aid."
+  }
+]

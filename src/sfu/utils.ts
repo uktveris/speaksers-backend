@@ -3,6 +3,11 @@ import { PipeToRouterOptions, Router } from "mediasoup/node/lib/RouterTypes";
 import { RouterRtpCodecCapability } from "mediasoup/node/lib/rtpParametersTypes";
 import { AppData, TransportListenInfo, WebRtcTransportOptions } from "mediasoup/node/lib/types";
 import { Worker } from "mediasoup/node/lib/types";
+import os from "os";
+
+const workers: Worker<AppData>[] = [];
+
+let nextWorkerIndex = 0;
 
 const mediacodecs: RouterRtpCodecCapability[] = [
   {
@@ -38,18 +43,31 @@ const listenInfo: TransportListenInfo = {
   portRange: { min: minPort, max: maxPort },
 };
 
-export async function createMediasoupWorker() {
+export async function initializeMediasoupWorkers() {
+  const numWorkers = Math.max(1, os.cpus().length - 1);
+  for (let i = 0; i < numWorkers; i++) {
+    const worker = await createMediasoupWorker();
+    workers.push(worker);
+  }
+}
+
+async function createMediasoupWorker() {
   const worker = await createWorker({
     rtcMinPort: minPort,
     rtcMaxPort: maxPort,
   });
 
-  console.log("mediasoup worker created: ", worker.pid);
-
   worker.on("died", (error) => {
     console.log("mediasoup worker died: ", worker.pid);
   });
 
+  console.log("created mediasoup worker:", worker.pid);
+  return worker;
+}
+
+export function getWorker() {
+  const worker = workers[nextWorkerIndex];
+  nextWorkerIndex = (nextWorkerIndex + 1) % workers.length;
   return worker;
 }
 

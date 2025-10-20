@@ -1,4 +1,4 @@
-import { DefaultEventsMap, Namespace, Socket } from "socket.io";
+import { Namespace, Socket } from "socket.io";
 import { logger } from "../../config/logging";
 import {
   createRoom,
@@ -54,7 +54,6 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
     io.to(peer).emit("peer_ready");
     if (size <= room.timerStopVotes.size) {
       console.log("votes treshold reached, stopping timer..");
-      // io.to(data.callId).emit("timer_stopped");
       io.to(room.id).emit("timer_stopped");
       io.to(room.id).emit("start_call");
     }

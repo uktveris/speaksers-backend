@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import { corsSocketOptions } from "../config/options";
 import { logger } from "../config/logging";
 import { roomHandlers } from "./handlers/roomHandlers";
-import { createMediasoupWorker } from "../sfu/utils";
+import { getWorker, initializeMediasoupWorkers } from "../sfu/utils";
 
 const context = "SOCKET";
 
@@ -11,7 +11,8 @@ async function initSocket(server: any) {
     cors: corsSocketOptions,
   });
 
-  const worker = await createMediasoupWorker();
+  // const worker = await createMediasoupWorker();
+  await initializeMediasoupWorkers();
 
   // TODO: add auth protection to socket on connection handler
   io.on("connection", (socket) => {
@@ -43,6 +44,7 @@ async function initSocket(server: any) {
         additionalInfo: { socketId: socket.id },
       },
     });
+    const worker = getWorker();
     roomHandlers(callsNsp, socket, worker);
   });
 
