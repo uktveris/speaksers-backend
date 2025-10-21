@@ -16,7 +16,7 @@ const supabase = createClient(process.env.SUPABASE_AUTH_URL!, process.env.SUPABA
 // seed languages & levels
 async function seedLanguages() {
   try {
-    const { data: exists, error: checkError } = await supabase.from("language_courses").select("id").limit(1);
+    const { data: exists, error: checkError } = await supabase.from("language_courses").select().limit(1);
 
     if (checkError) {
       console.log("error checking languages:", checkError);
@@ -47,7 +47,7 @@ async function seedLanguages() {
 // seed dialogue topics
 async function seedDialogueTopics() {
   try {
-    const { data: exists, error: checkError } = await supabase.from("dialogue_topics").select("id").limit(1);
+    const { data: exists, error: checkError } = await supabase.from("dialogue_topics").select().limit(1);
     console.log("available dialog topics:", { exists });
 
     if (checkError) {
@@ -77,7 +77,8 @@ async function seedDialogueTopics() {
 // seed avatars from ./assets
 async function seedAvatars() {
   try {
-    const { data: exists, error: checkError } = await supabase.schema("storage").from("objects").select("id").limit(1);
+    // const { data: exists, error: checkError } = await supabase.schema("storage").from("objects").select().limit(1);
+    const { data: exists, error: checkError } = await supabase.storage.from("avatars").list();
 
     if (checkError) {
       console.log("error checking avatars:", checkError);
