@@ -29,6 +29,9 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/assets ./assets
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/seedData ./seedData
+COPY --from=builder /app/tsconfig*.json ./
 
 EXPOSE 8080/tcp
 EXPOSE 4000-4010/udp
