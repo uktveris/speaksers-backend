@@ -16,7 +16,13 @@ const supabase = createClient(process.env.SUPABASE_AUTH_URL!, process.env.SUPABA
 // seed languages & levels
 async function seedLanguages() {
   try {
-    const { data: exists } = await supabase.from("language_courses").select("id").limit(1);
+    const { data: exists, error: checkError } = await supabase.from("language_courses").select("id").limit(1);
+
+    if (checkError) {
+      console.log("error checking languages:", checkError);
+      return;
+    }
+
     console.log("available lanugages:", { exists });
     if (exists && exists.length > 0) {
       console.log("skipping languages seeding, db already has initial data");
@@ -28,7 +34,7 @@ async function seedLanguages() {
     const dir = "./seedData/";
     const filePath = path.join(dir, "languages.json");
     const topics = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    const { error } = await supabase.from("language_courses").upsert(topics, { onConflict: "name" });
+    const { error } = await supabase.from("language_courses").insert(topics);
     if (error) {
       console.log("failed to upload languages from json: ", { error });
       return;
@@ -41,8 +47,14 @@ async function seedLanguages() {
 // seed dialogue topics
 async function seedDialogueTopics() {
   try {
-    const { data: exists } = await supabase.from("dialogue_topics").select("id").limit(1);
+    const { data: exists, error: checkError } = await supabase.from("dialogue_topics").select("id").limit(1);
     console.log("available dialog topics:", { exists });
+
+    if (checkError) {
+      console.log("error checking dialogue topics:", checkError);
+      return;
+    }
+
     if (exists && exists.length > 0) {
       console.log("skipping dialogue topics seeding, db already has initial data");
       return;
@@ -52,7 +64,7 @@ async function seedDialogueTopics() {
     const dir = "./seedData/";
     const filePath = path.join(dir, "dialogue_topics.json");
     const topics = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    const { error } = await supabase.from("dialogue_topics").upsert(topics, { onConflict: "title" });
+    const { error } = await supabase.from("dialogue_topics").insert(topics);
     if (error) {
       console.log("failed to upload dialogue topics from json: ", { error });
       return;
@@ -65,7 +77,13 @@ async function seedDialogueTopics() {
 // seed avatars from ./assets
 async function seedAvatars() {
   try {
-    const { data: exists } = await supabase.schema("storage").from("objects").select("id").limit(1);
+    const { data: exists, error: checkError } = await supabase.schema("storage").from("objects").select("id").limit(1);
+
+    if (checkError) {
+      console.log("error checking avatars:", checkError);
+      return;
+    }
+
     console.log("available avatars:", { exists });
     if (exists && exists.length > 0) {
       console.log("skipping avatar seeding, db already has initial data");
@@ -98,6 +116,11 @@ async function seedAvatars() {
   }
 }
 
-seedAvatars();
-seedDialogueTopics();
-seedLanguages();
+async function seed() {
+  await seedAvatars();
+  await seedDialogueTopics();
+  await seedLanguages();
+  console.log("=== seeding complete ===");
+}
+
+seed();
