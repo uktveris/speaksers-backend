@@ -17,6 +17,7 @@ const supabase = createClient(process.env.SUPABASE_AUTH_URL!, process.env.SUPABA
 async function seedLanguages() {
   try {
     const { data: exists } = await supabase.from("language_courses").select("id").limit(1);
+    console.log("available lanugages:", { exists });
     if (exists && exists.length > 0) {
       console.log("skipping languages seeding, db already has initial data");
       return;
@@ -41,6 +42,7 @@ async function seedLanguages() {
 async function seedDialogueTopics() {
   try {
     const { data: exists } = await supabase.from("dialogue_topics").select("id").limit(1);
+    console.log("available dialog topics:", { exists });
     if (exists && exists.length > 0) {
       console.log("skipping dialogue topics seeding, db already has initial data");
       return;
@@ -64,6 +66,7 @@ async function seedDialogueTopics() {
 async function seedAvatars() {
   try {
     const { data: exists } = await supabase.schema("storage").from("objects").select("id").limit(1);
+    console.log("available avatars:", { exists });
     if (exists && exists.length > 0) {
       console.log("skipping avatar seeding, db already has initial data");
       return;
