@@ -7,4 +7,8 @@ const router = Router();
 router.use("/users", userRoutes);
 router.use("/turn-servers", tokenRoutes);
 
+router.get("/health", (req, res) => {
+  res.json({ status: "backend is healthy" });
+});
+
 export default router;
