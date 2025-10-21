@@ -64,7 +64,7 @@ async function seedDialogueTopics() {
 async function seedAvatars() {
   try {
     const { data: exists } = await supabase.schema("storage").from("objects").select("id").limit(1);
-    if (exists) {
+    if (exists && exists.length > 0) {
       console.log("skipping avatar seeding, db already has initial data");
       return;
     }
