@@ -65,3 +65,5 @@ jobs:
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
             docker compose -f compose.preview.yaml pull
             docker compose -f compose.preview.yaml up -d --remove-orphans
+
+            docker system prune -f
