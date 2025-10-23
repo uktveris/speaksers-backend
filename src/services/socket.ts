@@ -9,9 +9,10 @@ const context = "SOCKET";
 async function initSocket(server: any) {
   const io = new Server(server, {
     cors: corsSocketOptions,
+    path: "/socket.io/",
+    allowEIO3: true,
   });
 
-  // const worker = await createMediasoupWorker();
   await initializeMediasoupWorkers();
 
   // TODO: add auth protection to socket on connection handler

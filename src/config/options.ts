@@ -1,16 +1,17 @@
+import { CorsOptions, CorsOptionsDelegate } from "cors";
 import { CookieOptions } from "express";
 
-const corsOptions = {
-  origin: ["http://localhost:8081"],
+const corsOptions: CorsOptions = {
+  origin: [process.env.CORS_ORIGIN!],
   allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 200,
   credentials: true,
 };
 
-const corsSocketOptions = {
-  origin: ["http://localhost:8081", "http://localhost:5173"],
+const corsSocketOptions: CorsOptions | CorsOptionsDelegate | undefined = {
+  origin: [process.env.CORS_ORIGIN!],
   methods: ["GET", "POST"],
-  // credentials: true,
+  credentials: true,
 };
 
 const cookieOptions: CookieOptions = {

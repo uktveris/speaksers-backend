@@ -18,6 +18,7 @@ const server = createServer(app);
 
 initSocket(server);
 
+app.set("trust-proxy", 1);
 app.use(cors(corsOptions));
 app.use(express.json());
 

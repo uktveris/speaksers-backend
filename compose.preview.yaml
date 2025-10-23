@@ -3,7 +3,7 @@ services:
     image: ghcr.io/uktveris/speaksers-backend:latest
     command: sh -c "npm run seed:preview && npm run preview"
     ports:
-      - "8080:8080/tcp"
+      - "127.0.0.1:8080:8080/tcp"
       - "4000-4010:4000-4010/udp"
     env_file: ".env.preview"
     init: true
