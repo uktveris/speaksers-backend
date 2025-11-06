@@ -73,6 +73,6 @@ jobs:
 
             sleep 5
 
-            docker compose -f compose.preview.yaml ps
+            docker compose -f compose.prod.yaml ps
 
             docker system prune -f

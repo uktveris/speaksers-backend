@@ -75,4 +75,10 @@ jobs:
 
             docker compose -f compose.preview.yaml ps
 
+            if ! docker compose -f compose.preview.yaml ps | grep -q "Up"; then
+              echo "Container failed to start. Showing logs:"
+              docker compose -f compose.preview.yaml logs --tail=50
+              exit 1
+            fi
+
             docker system prune -f
