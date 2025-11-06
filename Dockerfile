@@ -34,6 +34,6 @@ COPY --from=builder /app/seedData ./seedData
 COPY --from=builder /app/tsconfig*.json ./
 
 EXPOSE 8080/tcp
-EXPOSE 4000-4010/udp
+EXPOSE 4000-4999/udp
 
 CMD [ "npm", "run", "start" ]
