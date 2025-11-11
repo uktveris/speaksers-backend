@@ -62,6 +62,7 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
   socket.on("timer_ended", ({ callId }) => {
     if (callStarted) return;
     callStarted = true;
+    console.log("timer_ended: callid:", callId);
     console.log("timer_ended received, emmiting start_call");
     const room = getRoom(callId);
     if (!room) return;
