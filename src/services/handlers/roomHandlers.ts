@@ -12,6 +12,7 @@ import {
 import { createTimer, deleteTimer } from "../timerManager";
 import { cleanTransportRoom, joinTransportRoom } from "../../sfu/transportManager";
 import { Worker, AppData } from "mediasoup/node/lib/types";
+import { activeRecordings, startRecordingSession, stopRecording, stopRecordingSession } from "../../sfu/callRecorder";
 
 const context = "ROOM_HANDLERS";
 
@@ -34,8 +35,9 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
       const callId = createRoom(io, socket, waitingUser);
       initiateTopicSetup(io, callId, socket, waitingUser);
       const duration = 1000 * 60;
-      createTimer(io, socket, waitingUser, callId, duration);
+      createTimer(io, callId, duration);
 
+      startRecordingSession(callId);
       joinTransportRoom(io, socket, waitingUser, worker, callId);
       waitingUser = null;
     } else {
@@ -84,7 +86,6 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
   });
 
   socket.on("end_call", async (data) => {
-    console.log("transport rooms state on end_call:");
     logger.info({
       message: "call ended",
       context: context,
@@ -96,13 +97,14 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
       },
     });
     socket.to(data.recipient).emit("end_call");
+    await stopRecordingSession(data.callId);
     await removeRoomMembers(io, data.callId);
     deleteTimer(data.callId);
     endRoom(data.callId);
     cleanTransportRoom(data.callId);
   });
 
-  socket.on("disconnect", () => {
+  socket.on("disconnect", async () => {
     if (waitingUser === socket) {
       logger.info({
         message: "user removed from call queue",
@@ -116,6 +118,16 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
     const room = findSocketRoom(socket.id);
     if (room) {
       io.to(room.id).emit("end_call");
+      const session = activeRecordings.get(room.id);
+      if (session?.speakers.has(socket.id)) {
+        const recordingData = session.speakers.get(socket.id)!;
+        try {
+          await stopRecording(recordingData);
+          session.speakers.delete(socket.id);
+        } catch (error) {
+          console.log("error while stopping ffmpeg:", error);
+        }
+      }
     }
     logger.info({
       message: "user disconnected /calls nsp",

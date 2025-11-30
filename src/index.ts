@@ -10,6 +10,7 @@ import { corsOptions } from "./config/options";
 import cors from "cors";
 import router from "./routes";
 import initSocket from "./services/socket";
+import { startCleanupJob } from "./jobs/cleanup";
 
 const port = process.env.PORT;
 
@@ -23,6 +24,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api", router);
+
+startCleanupJob();
 
 server.listen(port, () => {
   console.log("The server is running on port:", port);

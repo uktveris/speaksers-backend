@@ -1,7 +1,7 @@
 import { createWorker } from "mediasoup";
 import { PipeToRouterOptions, Router } from "mediasoup/node/lib/RouterTypes";
 import { RouterRtpCodecCapability } from "mediasoup/node/lib/rtpParametersTypes";
-import { AppData, TransportListenInfo, WebRtcTransportOptions } from "mediasoup/node/lib/types";
+import { AppData, PlainTransportOptions, TransportListenInfo, WebRtcTransportOptions } from "mediasoup/node/lib/types";
 import { Worker } from "mediasoup/node/lib/types";
 import os from "os";
 
@@ -41,6 +41,14 @@ const listenInfo: TransportListenInfo = {
   protocol: "udp",
   ip: announcedIp!,
   portRange: { min: minPort, max: maxPort },
+};
+
+export const plainTransportOptions: PlainTransportOptions = {
+  listenIp: { ip: "127.0.0.1", announcedIp: undefined },
+  rtcpMux: false,
+  comedia: false,
+  enableSctp: false,
+  enableSrtp: false,
 };
 
 export async function initializeMediasoupWorkers() {

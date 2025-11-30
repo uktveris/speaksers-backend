@@ -23,8 +23,7 @@ async function seedLanguages() {
       return;
     }
 
-    console.log("available lanugages:", { exists });
-    if (exists && exists.length > 0) {
+    if (!!exists && exists.length > 0) {
       console.log("skipping languages seeding, db already has initial data");
       return;
     }
@@ -48,14 +47,13 @@ async function seedLanguages() {
 async function seedDialogueTopics() {
   try {
     const { data: exists, error: checkError } = await supabase.from("dialogue_topics").select().limit(1);
-    console.log("available dialog topics:", { exists });
 
     if (checkError) {
       console.log("error checking dialogue topics:", checkError);
       return;
     }
 
-    if (exists && exists.length > 0) {
+    if (!!exists && exists.length > 0) {
       console.log("skipping dialogue topics seeding, db already has initial data");
       return;
     }
@@ -77,7 +75,6 @@ async function seedDialogueTopics() {
 // seed avatars from ./assets
 async function seedAvatars() {
   try {
-    // const { data: exists, error: checkError } = await supabase.schema("storage").from("objects").select().limit(1);
     const { data: exists, error: checkError } = await supabase.storage.from("avatars").list();
 
     if (checkError) {
@@ -85,8 +82,7 @@ async function seedAvatars() {
       return;
     }
 
-    console.log("available avatars:", { exists });
-    if (exists && exists.length > 0) {
+    if (!!exists && exists.length > 0) {
       console.log("skipping avatar seeding, db already has initial data");
       return;
     }

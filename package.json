@@ -37,6 +37,7 @@
     "jose": "^6.1.0",
     "mediasoup": "^3.19.2",
     "socket.io": "^4.8.1",
+    "supabase": "^2.63.1",
     "uuid": "^13.0.0",
     "winston": "^3.17.0",
     "winston-transport": "^4.9.0"

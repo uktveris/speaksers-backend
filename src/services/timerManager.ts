@@ -4,8 +4,6 @@ const timers = new Map<string, number>();
 
 export function createTimer(
   io: Namespace<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
-  socket1: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
-  socket2: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
   callId: string,
   durationMs: number,
 ): number {

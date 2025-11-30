@@ -1,10 +1,4 @@
-import {
-  AppData,
-  Consumer,
-  Producer,
-  Router,
-  RtpCapabilities,
-} from "mediasoup/node/lib/types";
+import { AppData, Consumer, Producer, Router, RtpCapabilities } from "mediasoup/node/lib/types";
 import { WebRtcTransport } from "mediasoup/node/lib/WebRtcTransportTypes";
 
 export interface Peer {
@@ -20,4 +14,5 @@ export interface TransportRoom {
   id: string;
   peers: Map<string, Peer>;
   router: Router<AppData>;
+  recordingEnabled?: boolean;
 }

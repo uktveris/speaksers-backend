@@ -5,6 +5,7 @@ import { WebRtcTransport } from "mediasoup/node/lib/WebRtcTransportTypes";
 import { createMediasoupTransport } from "../../sfu/utils";
 import { Peer, TransportRoom } from "../../models/calls";
 import { deleteTransportRoom } from "../../sfu/transportManager";
+import { activeRecordings, startRecordingProducer, stopRecording } from "../../sfu/callRecorder";
 
 const context = "SIGNALING";
 
@@ -67,13 +68,38 @@ export async function attachMediasoupHandlers(io: Namespace, socket: Socket, roo
     peer.producers.set(producer.id, producer);
     console.log("transport_produce: producer id: ", producer.id);
 
+    if (kind === "audio") {
+      try {
+        const session = activeRecordings.get(room.id);
+        if (session) {
+          const recordingData = await startRecordingProducer(producer, peer.id, room.id, room.router);
+          session.speakers.set(peer.id, recordingData);
+        } else {
+          console.log("recording session not found for room id:", room.id);
+        }
+      } catch (error) {
+        console.log("failed to start reording:", error);
+      }
+    }
+
     producer.on("transportclose", () => {
       console.log("transport for this producer closed");
       producer.close();
     });
-    producer.on("@close", () => {
+    producer.on("@close", async () => {
       console.log("closed producer id: ", producer.id);
       peer.producers.delete(producer.id);
+
+      const session = activeRecordings.get(room.id);
+      if (session && session.speakers.has(peer.id)) {
+        const recordingData = session.speakers.get(peer.id);
+        try {
+          await stopRecording(recordingData!);
+          session.speakers.delete(peer.id);
+        } catch (error) {
+          console.log("error while stopping recording on producer close:", error);
+        }
+      }
     });
 
     callBack({
