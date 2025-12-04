@@ -1,18 +1,11 @@
 import { Namespace, Socket } from "socket.io";
 import { logger } from "../../config/logging";
-import {
-  createRoom,
-  endRoom,
-  findSocketRoom,
-  getRoom,
-  getRoomSize,
-  initiateTopicSetup,
-  removeRoomMembers,
-} from "../roomManager";
+import { createRoom, endRoom, getRoom, getRoomSize, initiateTopicSetup, removeRoomMembers } from "../roomManager";
 import { createTimer, deleteTimer } from "../timerManager";
 import { cleanTransportRoom, joinTransportRoom } from "../../sfu/transportManager";
 import { Worker, AppData } from "mediasoup/node/lib/types";
 import { activeRecordings, startRecordingSession, stopRecording, stopRecordingSession } from "../../sfu/callRecorder";
+import { transcribedCalls, transcribeDialog } from "../transcription/transcriptionService";
 
 const context = "ROOM_HANDLERS";
 
@@ -87,7 +80,7 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
 
   socket.on("end_call", async (data) => {
     logger.info({
-      message: "call ended",
+      message: "end call executed",
       context: context,
       meta: {
         additionalInfo: {
@@ -96,12 +89,50 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
         },
       },
     });
+    console.log(`socket [${socket.id}] received 'end_call' event, received data: ${JSON.stringify(data, null, 2)}`);
     socket.to(data.recipient).emit("end_call");
+
+    if (transcribedCalls.has(data.callId)) {
+      console.log("skipping transcription; already initiated for call:", data.callId);
+      return;
+    }
+    transcribedCalls.add(data.callId);
+    const recordingSession = activeRecordings.get(data.callId);
+
     await stopRecordingSession(data.callId);
     await removeRoomMembers(io, data.callId);
     deleteTimer(data.callId);
     endRoom(data.callId);
     cleanTransportRoom(data.callId);
+
+    if (!recordingSession) {
+      console.log("no recording session found for call:", data.callId);
+      transcribedCalls.delete(data.callId);
+      return;
+    }
+    const speakers = Array.from(recordingSession.speakers.entries());
+    if (speakers.length !== 2) {
+      console.log("error occurred, expected 2 speakers, found:", speakers.length);
+      transcribedCalls.delete(data.callId);
+      return;
+    }
+    const [speaker1, speaker2] = speakers;
+    const audioPath1 = speaker1[1].filePath;
+    const audioPath2 = speaker2[1].filePath;
+    if (!audioPath1 || !audioPath2) {
+      console.log("missing audio paths for transcription");
+      transcribedCalls.delete(data.callId);
+      return;
+    }
+    console.log("starting transcription for room:", data.callId);
+    const { result, error } = await transcribeDialog(speaker1[0], audioPath1, speaker2[0], audioPath2);
+    console.log("finished transcription for socket:", socket.id);
+    if (error) {
+      console.log("error occurred while transcribing:", error);
+      return;
+    }
+    console.log("transcription:", result?.text);
+    transcribedCalls.delete(data.callId);
   });
 
   socket.on("disconnect", async () => {
@@ -114,20 +145,6 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
         },
       });
       waitingUser = null;
-    }
-    const room = findSocketRoom(socket.id);
-    if (room) {
-      io.to(room.id).emit("end_call");
-      const session = activeRecordings.get(room.id);
-      if (session?.speakers.has(socket.id)) {
-        const recordingData = session.speakers.get(socket.id)!;
-        try {
-          await stopRecording(recordingData);
-          session.speakers.delete(socket.id);
-        } catch (error) {
-          console.log("error while stopping ffmpeg:", error);
-        }
-      }
     }
     logger.info({
       message: "user disconnected /calls nsp",

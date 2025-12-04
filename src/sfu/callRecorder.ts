@@ -117,12 +117,6 @@ export async function startRecordingProducer(
 
   ffmpegProcess.on("close", async (code) => {
     console.log(`FFmpeg process for peer ${peerId} closed with code ${code}`);
-    // TODO: might be tempory commented out, delete or make available again
-    // try {
-    //   await fs.unlink(sdpFilePath);
-    // } catch (error) {
-    //   console.log("error while deleting sdp file:", error);
-    // }
   });
 
   await new Promise((resolve) => setTimeout(resolve, 1000));
