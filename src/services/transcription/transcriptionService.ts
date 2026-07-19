@@ -1,4 +1,4 @@
-import { getProvider, SpeakerTranscription } from "./transcriptionProvider";
+import { getProvider, SpeakerTranscription } from "../../config/apiProvider";
 import fs from "fs";
 
 export const transcribedCalls = new Set<string>();

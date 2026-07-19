@@ -6,6 +6,7 @@ import { cleanTransportRoom, joinTransportRoom } from "../../sfu/transportManage
 import { Worker, AppData } from "mediasoup/node/lib/types";
 import { activeRecordings, startRecordingSession, stopRecording, stopRecordingSession } from "../../sfu/callRecorder";
 import { transcribedCalls, transcribeDialog } from "../transcription/transcriptionService";
+import { getDialogFeedback } from "../dialogFeedback/llmConn";
 
 const context = "ROOM_HANDLERS";
 
@@ -132,7 +133,11 @@ export function roomHandlers(io: Namespace, socket: Socket, worker: Worker<AppDa
       return;
     }
     console.log("transcription:", result?.text);
+    io.to(socket.id).emit("transcription_done");
+    io.to(data.recipient).emit("transcription_done");
     transcribedCalls.delete(data.callId);
+
+    const feedback = await getDialogFeedback(result!.text);
   });
 
   socket.on("disconnect", async () => {
